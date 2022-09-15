@@ -1,0 +1,282 @@
+{
+  "name": "ArtistSpotifyToYouTube",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "limit": 1,
+        "filters": {
+          "q": "=\"{{$json[\"track\"][\"artists\"][0][\"name\"]}} - {{$json[\"track\"][\"name\"]}}\" Official Video"
+        },
+        "options": {
+          "order": "relevance"
+        }
+      },
+      "name": "YouTube",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        420,
+        300
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "4",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$node[\"Function1\"].json[\"playlist\"]}}",
+        "limit": 10
+      },
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        0,
+        300
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        220,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "operation": "=equal",
+              "value2": "={{$node[\"Split\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        740,
+        480
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "FunctionItem",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "var indice = $node[\"SplitInBatches\"].context[\"currentRunIndex\"];\nvar SongTitle = $item(0).$node[\"YouTube\"].json[\"snippet\"][\"title\"];\n\nvar VideoURL = \"https://www.youtube.com/watch?v=\" + $item(0).$node[\"YouTube\"].json[\"id\"][\"videoId\"];\n\nif (indice == 0) {\n//item.UltimoTweetID = null;\nitem.UltimoTweetID = $item(0).$node[\"TwitterPOST\"].json[\"id_str\"];\n}\nelse  {\n//Supuestamente NODE TWITTER recibe multiples valores por eso siempre se apunta al cero.\nitem.UltimoTweetID = $item(0).$node[\"TwitterPOST1\"].json[\"id_str\"];\n}\n\nitem.indiceSplit = indice;\n\nSongTitle = SongTitle.replace(/&quot;/g, \"'\");\nSongTitle = SongTitle.replace(/&#39;/g, \"'\");\n\nitem.Tweet = SongTitle + \" \" + VideoURL;\n\nreturn item;"
+      },
+      "name": "AgregarTweetID",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        680,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{$json[\"Tweet\"]}}",
+        "additionalFields": {
+          "inReplyToStatusId": "={{$json[\"UltimoTweetID\"]}}"
+        }
+      },
+      "name": "TwitterPOST1",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        900,
+        240
+      ],
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "3",
+          "name": "Twitter OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      tweet: \"Día 31 recomendando nuevas bandas: Ghost, la misteriosa banda de Suecia. Álbum destacado: IMPERA (2020), álbum del año hasta el momento.\",\n      playlist: \"6dTqItJvRPDWzGvS1UFoH4\"\n    }\n  }\n];\n\n//tweet: \"Día 17 recomendando nuevas bandas: Night Demon, banda de metal clásico de California. Álbum destacado: Darkness Remains (2017).\",\n//      playlist: \"3eHNYsJfb8sZssmFcWJzX3\""
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{$json[\"tweet\"]}} https://open.spotify.com/playlist/{{$json[\"playlist\"]}}",
+        "additionalFields": {
+          "inReplyToStatusId": "={{$json[\"UltimoTweetID\"]}}"
+        }
+      },
+      "name": "TwitterPOST",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        40,
+        100
+      ],
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "3",
+          "name": "Twitter OAuth account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [
+          {
+            "node": "YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgregarTweetID": {
+      "main": [
+        [
+          {
+            "node": "TwitterPOST1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube": {
+      "main": [
+        [
+          {
+            "node": "AgregarTweetID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TwitterPOST1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "FunctionItem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "TwitterPOST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TwitterPOST": {
+      "main": [
+        [
+          {
+            "node": "Spotify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": 9,
+  "tags": []
+}
