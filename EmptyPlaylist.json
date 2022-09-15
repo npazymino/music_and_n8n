@@ -1,0 +1,142 @@
+{
+  "name": "VaciarPlaylist",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "uri",
+              "value": "={{$json[\"track\"][\"uri\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        580,
+        100
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      nullPlaylist: \"7sEbs0ys6lFzZ7cruvWMPV\"\n    }\n  }\n];"
+      },
+      "name": "Parameters",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        220,
+        40
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "delete",
+        "id": "={{$item(0).$node[\"Parameters\"].json[\"0\"][\"json\"][\"nullPlaylist\"]}}",
+        "trackID": "={{$json[\"uri\"]"
+      },
+      "name": "SpotifyRemoveItem",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        700,
+        160
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$json[\"0\"][\"json\"][\"nullPlaylist\"]}}",
+        "returnAll": true
+      },
+      "name": "SpotifyGetTracks",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        420,
+        40
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "SpotifyRemoveItem",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parameters": {
+      "main": [
+        [
+          {
+            "node": "SpotifyGetTracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SpotifyGetTracks": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionTimeout": -1
+  },
+  "id": 13,
+  "tags": []
+}
