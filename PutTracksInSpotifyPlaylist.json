@@ -1,0 +1,326 @@
+{
+  "name": "PutTracksInPlaylist",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -1460,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "removeDuplicates"
+      },
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      prefix: \"The Best Guitar Solos of \",\n      destinationPlaylist: \"7sEbs0ys6lFzZ7cruvWMPV\"\n    }\n  }\n];"
+      },
+      "name": "Parameters",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "get",
+        "id": "={{$json[\"id\"]}}"
+      },
+      "name": "PlayList",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -1260,
+        -220
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$json[\"id\"]}}",
+        "returnAll": true
+      },
+      "name": "PlaylistTracks",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -1100,
+        -220
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "operation": "=equal",
+              "value2": "={{$node[\"SplitInBatches2\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF2",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -160
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "SplitInBatches2",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -1420,
+        -220
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "FunctionItem",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        -220,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n//let FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"prefix\"];\nlet VArrayLength = items.length;\n\nfor (item of items) {\n  //const PlaylistKey = item.json.name;\n\n\n      let CTrackName = item.json.track.name;\n      let CTrackURI = item.json.track.uri;\n      let CArtistName = item.json.track.artists[0].name;\n\n      var ArrayTemp = {VTrackURI : CTrackURI, ArtistName : CArtistName, TrackName : CTrackName};\n\n\n    //if (PlaylistKey.includes(FiltroPlaylist)) {\n\n      results.push({json:ArrayTemp});\n      //results.unshift({json:item.json});\n\n  //}\n\n  \n\n  \n}\n\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Filtrado3",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "id": "={{$item(0).$node[\"Parameters\"].json[\"destinationPlaylist\"]}}",
+        "trackID": "={{$json[\"VTrackURI\"]}}",
+        "additionalFields": {}
+      },
+      "name": "Spotify1",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -460
+      ],
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "maxTries": 2,
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getUserPlaylists",
+        "returnAll": "={{true}}"
+      },
+      "name": "Spotify2",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -1120,
+        -520
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nlet FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"prefix\"];\nfor (item of items) {\n  const PlaylistKey = item.json.name;\n\n\n    if (PlaylistKey.includes(FiltroPlaylist)) {\n      results.push({json:item.json});\n      //results.unshift({json:item.json});\n\n  }\n  \n}\n\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "FiltroPlaylistsSolos",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        -520
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parameters": {
+      "main": [
+        [
+          {
+            "node": "Spotify2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlayList": {
+      "main": [
+        [
+          {
+            "node": "PlaylistTracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF2": {
+      "main": [
+        [
+          {
+            "node": "FunctionItem",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SplitInBatches2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PlaylistTracks": {
+      "main": [
+        [
+          {
+            "node": "Filtrado3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Spotify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrado3": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify2": {
+      "main": [
+        [
+          {
+            "node": "FiltroPlaylistsSolos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches2": {
+      "main": [
+        [
+          {
+            "node": "PlayList",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FiltroPlaylistsSolos": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify1": {
+      "main": [
+        [
+          {
+            "node": "IF2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": 16,
+  "tags": []
+}
