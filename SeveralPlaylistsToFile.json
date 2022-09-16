@@ -1,0 +1,335 @@
+{
+  "name": "SeveralPlaylistsToFile",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        520
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## 👇 Get started faster \nLightning tour of the key concepts \n\n[![n8n quickstart video](/static/quickstart_thumbnail.png#full-width)](https://www.youtube.com/watch?v=RpjQTGKm-ok)",
+        "height": 300,
+        "width": 380
+      },
+      "name": "_QUICKSTART_NOTE_",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -260,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$json[\"id\"]}}",
+        "returnAll": true
+      },
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        480,
+        420
+      ],
+      "executeOnce": false,
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "fileFormat": "xlsx",
+        "options": {}
+      },
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        520,
+        1040
+      ],
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "ArtistName",
+              "value": "={{$json[\"track\"][\"artists\"][0][\"name\"]}}"
+            },
+            {
+              "name": "TrackURL",
+              "value": "= {{$json[\"track\"][\"uri\"]}}"
+            },
+            {
+              "name": "AlbumName",
+              "value": "={{$json[\"track\"][\"album\"][\"name\"]}}"
+            },
+            {
+              "name": "ReleaseDate",
+              "value": "={{$json[\"track\"][\"album\"][\"release_date\"].substr(0,4)}}"
+            },
+            {
+              "name": "TrackName",
+              "value": "={{$json[\"track\"][\"name\"]}}"
+            },
+            {
+              "name": "OriginalPlaylist",
+              "value": "={{$json[\"PlaylistOriginal\"]}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        900,
+        740
+      ],
+      "notesInFlow": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getUserPlaylists",
+        "returnAll": true
+      },
+      "name": "Spotify2",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -760,
+        840
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nlet FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"prefix\"];\n\nfor (item of items) {\n  const PlaylistKey = item.json.name;\n\n\n    if (PlaylistKey.includes(FiltroPlaylist)) {\n    //if (PlaylistKey.includes('The Rolling Stones')) {\n      results.push({json:item.json});\n  }\n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Function2",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -520,
+        940
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "value2": "={{$node[\"Split\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        420,
+        700
+      ],
+      "executeOnce": false
+    },
+    {
+      "parameters": {
+        "functionCode": "\n\n\nvar indice = $node[\"Split\"].context[\"currentRunIndex\"];\n\n\nfor (item of items) {\n  \n  item.json.PlaylistOriginal= $item(indice).$node[\"Function2\"].json[\"name\"];\n\n}\nreturn items;"
+      },
+      "name": "Function3",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        740,
+        420
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "Split",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -100,
+        620
+      ],
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "functionCode": "const allData = []\n\nlet counter = 0;\ndo {\n  try {\n    const items = $items(\"Set\", 0, counter);\n    //allData.push.apply(allData, items);\n\nallData.push.apply(allData, items);\n\n  } catch (error) {\n    return allData;  \n  }\n\n  counter++;\n} while(true);\n\n"
+      },
+      "name": "Function4",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        260,
+        1040
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      prefix: \"The Best Guitar Solos of \"\n    }\n  }\n];"
+      },
+      "name": "Parameters",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -1000,
+        720
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify": {
+      "main": [
+        [
+          {
+            "node": "Function3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify2": {
+      "main": [
+        [
+          {
+            "node": "Function2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function2": {
+      "main": [
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function3": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Function4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Split",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split": {
+      "main": [
+        [
+          {
+            "node": "Spotify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function4": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parameters": {
+      "main": [
+        [
+          {
+            "node": "Spotify2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": 6,
+  "tags": []
+}
