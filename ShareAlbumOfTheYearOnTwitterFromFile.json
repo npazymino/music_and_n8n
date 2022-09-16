@@ -1,0 +1,502 @@
+{
+  "name": "ShareAlbumOfTheYearOnTwitterFromFile",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -820,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "limit": 1,
+        "filters": {
+          "q": "=\"{{$json[\"artists\"][0][\"name\"]}}\" - {{$json[\"name\"]}} Official Video"
+        },
+        "options": {
+          "order": "relevance"
+        }
+      },
+      "name": "YouTube",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        580,
+        280
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "4",
+          "name": "YouTube account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": "={{$node[\"SplitInBatches\"].context[\"noItemsLeft\"]}}"
+        }
+      },
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        380,
+        380
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "operation": "=equal",
+              "value2": "={{$node[\"SplitInBatches\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        900,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "var indice = $node[\"SplitInBatches\"].context[\"currentRunIndex\"];\nvar SongTitle = $item(0).$node[\"YouTube\"].json[\"snippet\"][\"title\"];\n\nvar VideoURL = \"https://www.youtube.com/watch?v=\" + $item(0).$node[\"YouTube\"].json[\"id\"][\"videoId\"];\n\nif (indice == 0) {\nitem.UltimoTweetID = $item(0).$node[\"TwitterPOST\"].json[\"id_str\"];\n}\nelse  {\n//Supuestamente NODE TWITTER recibe multiples valores por eso siempre se apunta al cero.\nitem.UltimoTweetID = $item(0).$node[\"TwitterPOST1\"].json[\"id_str\"];\n}\n\nitem.indiceSplit = indice;\nSongTitle = SongTitle.replace(/&quot;/g, \"'\");\nSongTitle = SongTitle.replace(/&#39;/g, \"'\");\n\nitem.Tweet = SongTitle + \" \" + VideoURL;\nreturn item;"
+      },
+      "name": "AgregarTweetID",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        840,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "text": "={{$json[\"Tweet\"]}}",
+        "additionalFields": {
+          "inReplyToStatusId": "={{$json[\"UltimoTweetID\"]}}"
+        }
+      },
+      "name": "TwitterPOST1",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        240
+      ],
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "3",
+          "name": "Twitter OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "={{$json[\"AlbumName\"]}} de {{$json[\"ArtistName\"]}} https://open.spotify.com/album/{{$json[\"AlbumID\"]}}",
+        "additionalFields": {
+          "inReplyToStatusId": "={{$json[\"UltimoTweetID\"]}}"
+        }
+      },
+      "name": "TwitterPOST",
+      "type": "n8n-nodes-base.twitter",
+      "typeVersion": 1,
+      "position": [
+        -680,
+        560
+      ],
+      "credentials": {
+        "twitterOAuth1Api": {
+          "id": "3",
+          "name": "Twitter OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "album",
+        "operation": "getTracks",
+        "id": "={{$node[\"SplitInBatches1\"].json[\"AlbumID\"]}}",
+        "returnAll": true
+      },
+      "name": "Spotify2",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        340
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "track",
+        "operation": "get",
+        "id": "={{$json[\"id\"]}}"
+      },
+      "name": "Spotify3",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -440,
+        340
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "name": "SplitInBatches1",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "operation": "=equal",
+              "value2": "={{$node[\"SplitInBatches1\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF1",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -300,
+        800
+      ]
+    },
+    {
+      "parameters": {},
+      "name": "FunctionItem1",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        0,
+        780
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "sort",
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "=popularity",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Item Lists1",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "limit",
+        "maxItems": 5
+      },
+      "name": "Item Lists2",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        -160,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      year: 2022,\n      filename: \"/Users/Nelo/Downloads/albums2022.xlsx\"\n    }\n  }\n];"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -580,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "={{$json[\"filename\"]}}"
+      },
+      "name": "Read Binary File1",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -380,
+        120
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//Works with Excel secuential date number.\nconst results = [];\nlet DateFilter = $today;\nfor (item of items) {\n  \n  const TempFormattedDate = new Date(Date.UTC(0, 0, item.json.ShareDay, 0, 0,0,0));\n  const FormattedDate = new Date(TempFormattedDate.setHours(0,0,0,0));\n  const AlbumShareDay = Math.floor(FormattedDate.getTime());\n\n  console.log(\"DateFilter: \" + DateFilter);\n  console.log(\"FormattedDate: \" + FormattedDate);\n  console.log(\"AlbumShareDay: \" + AlbumShareDay);\n\n      if (AlbumShareDay == DateFilter) {\n        results.push({json:item.json});\n    }  \n}\nreturn results;"
+      },
+      "name": "Function1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        40,
+        120
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [
+          {
+            "node": "YouTube",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgregarTweetID": {
+      "main": [
+        [
+          {
+            "node": "TwitterPOST1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube": {
+      "main": [
+        [
+          {
+            "node": "AgregarTweetID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TwitterPOST1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "IF1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TwitterPOST": {
+      "main": [
+        [
+          {
+            "node": "Spotify2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify2": {
+      "main": [
+        [
+          {
+            "node": "Spotify3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches1": {
+      "main": [
+        [
+          {
+            "node": "TwitterPOST",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF1": {
+      "main": [
+        [
+          {
+            "node": "FunctionItem1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SplitInBatches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify3": {
+      "main": [
+        [
+          {
+            "node": "Item Lists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists1": {
+      "main": [
+        [
+          {
+            "node": "Item Lists2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists2": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File1": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spreadsheet File": {
+      "main": [
+        [
+          {
+            "node": "Function1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function1": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": 18,
+  "tags": []
+}
