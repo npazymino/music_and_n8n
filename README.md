@@ -19,7 +19,7 @@ My n8n automations for sharing, organizing and enjoying music.
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <a href="#about-the-project">About The Project</a>
+    <li><a href="#about-the-project">About The Project</a></li>
     <li><a href="#built-with">Built With</a></li>
     <li><a href="#getting-started">Getting Started</a></li>
     <li><a href="#prerequisites">Prerequisites</a></li>
@@ -82,11 +82,17 @@ You'll need an n8n account, the desktop application installed or a cloud user ac
 Brief explanation of each flow:
 
 EmptyPlaylist.json
+
 PutTracksInSpotifyPlaylist.json
+
 PromoteArtistOnTwitter.json
+
 AlbumsFromSpotifyPlaylist.json
+
 ShareAlbumOfTheYearOnTwitterFromFile.json
+
 SeveralPlaylistsToFile.json
+
 DivideSpotifyPlaylistByReleaseYearV2.json
 
 
