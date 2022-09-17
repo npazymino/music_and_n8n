@@ -71,7 +71,7 @@ You'll need an n8n account, the desktop application installed or a cloud user ac
 2. Get a free API Key from Spotify [https://spotify.com](https://developer.spotify.com/documentation/web-api/)
 3. Get a free API Key from YouTube [https://youtube.com](https://console.cloud.google.com/apis/dashboard)
 4. Get a free API Key from Twitter [https://twitter.com](https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api)
-5. Copy the JSON files and open then in n8n (desktop/cloud). 
+5. Copy the JSON files and open them in n8n (desktop/cloud). 
 6. Customize with own credentials and playlist URIs/IDs.     
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
