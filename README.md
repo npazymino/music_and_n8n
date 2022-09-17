@@ -83,19 +83,21 @@ You'll need an n8n account, the desktop application installed or a cloud user ac
 
 Brief explanation of each flow:
 
-EmptyPlaylist.json
+**EmptyPlaylist.json**.- This flow will allow you to empty a Spotify playlist. Remove all the tracks and leave the playlist void. May take several executions if the playlist exceeds more than 256 tracks.
 
-PutTracksInSpotifyPlaylist.json
+**PutTracksInSpotifyPlaylist.json**.- This flow will allow you to merge several playlists into a single Spotify playlist. The criteria must be edited as per needed.
 
-PromoteArtistOnTwitter.json
+**PromoteArtistOnTwitter.json**.- This flow will allow you to share a Twitter thread with an artist Spotify playlist link and subsequent top 10 songs, one per tweet including a YouTube video. The criteria must be edited as per needed.
 
-AlbumsFromSpotifyPlaylist.json
+**AlbumsFromSpotifyPlaylist.json**.- This flow will allow you to get all the albums represented within a Spotify playlist and store them in a Excel file. The criteria must be edited as per needed.
 
-ShareAlbumOfTheYearOnTwitterFromFile.json
+**ShareAlbumOfTheYearOnTwitterFromFile.json**.- This flow will allow you to share a list of albums in Twitter in a thread (Spotify link + popular YouTube videos). The list will be contained in an Excel file (sample file _albums2022.xlsx_ provided). The criteria must be edited as per needed.
 
-SeveralPlaylistsToFile.json
+Recommendation: Allow no more than 3 albums per day to avoid consuming all the YouTube API request limit.
 
-DivideSpotifyPlaylistByReleaseYearV2.json
+**SeveralPlaylistsToFile.json**.- This flow will allow you to merge several playlists into a single Excel file in order to be exported. The criteria must be edited as per needed.
+
+**DivideSpotifyPlaylistByReleaseYearV2.json**.- This flow will allow you to divide a playlist into several playlists. The criteria must be edited as per needed, right now the criteria is _release year_ of the song.
 
 
 
@@ -107,7 +109,7 @@ DivideSpotifyPlaylistByReleaseYearV2.json
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE.txt` for more information.
+Distributed under the Apache 2.0 License. See `LICENSE.txt` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
