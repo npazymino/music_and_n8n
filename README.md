@@ -84,23 +84,27 @@ You'll need an n8n account, the desktop application installed or a cloud user ac
 Brief explanation of each flow:
 
 **EmptyPlaylist.json**.- This flow will allow you to empty a Spotify playlist. Remove all the tracks and leave the playlist void. May take several executions if the playlist exceeds more than 256 tracks.
+![image](https://user-images.githubusercontent.com/99626589/190836960-76b8ae83-6354-4a7a-901d-89d307375f0b.png)
 
 **PutTracksInSpotifyPlaylist.json**.- This flow will allow you to merge several playlists into a single Spotify playlist. The criteria must be edited as per needed.
+![image](https://user-images.githubusercontent.com/99626589/190836733-e18bd12e-1da1-4c7a-b65e-b75c7a327619.png)
 
 **PromoteArtistOnTwitter.json**.- This flow will allow you to share a Twitter thread with an artist Spotify playlist link and subsequent top 10 songs, one per tweet including a YouTube video. The criteria must be edited as per needed.
+![image](https://user-images.githubusercontent.com/99626589/190836930-37b85a7f-007e-403e-9b16-aeaf1dfa366a.png)
 
 **AlbumsFromSpotifyPlaylist.json**.- This flow will allow you to get all the albums represented within a Spotify playlist and store them in a Excel file. The criteria must be edited as per needed.
+![image](https://user-images.githubusercontent.com/99626589/190836892-7c59795a-ebf9-41b2-9dba-7d2488a96115.png)
 
 **ShareAlbumOfTheYearOnTwitterFromFile.json**.- This flow will allow you to share a list of albums in Twitter in a thread (Spotify link + popular YouTube videos). The list will be contained in an Excel file (sample file _albums2022.xlsx_ provided). The criteria must be edited as per needed.
+![image](https://user-images.githubusercontent.com/99626589/190836844-7477a3b7-e3aa-4ef0-8e5a-a54c7d106179.png)
 
 Recommendation: Allow no more than 3 albums per day to avoid consuming all the YouTube API request limit.
 
 **SeveralPlaylistsToFile.json**.- This flow will allow you to merge several playlists into a single Excel file in order to be exported. The criteria must be edited as per needed.
+![image](https://user-images.githubusercontent.com/99626589/190836809-ede2ba10-f9d7-4963-9de6-3f04054853a2.png)
 
 **DivideSpotifyPlaylistByReleaseYearV2.json**.- This flow will allow you to divide a playlist into several playlists. The criteria must be edited as per needed, right now the criteria is _release year_ of the song.
-
-
-
+![image](https://user-images.githubusercontent.com/99626589/190836866-edaed381-8cc6-4f91-9057-574a3299bd98.png)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
