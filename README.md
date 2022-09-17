@@ -147,9 +147,9 @@ Project Link: [/npazymino/music_and_n8n](https://github.com/npazymino/npazymino/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/npazymino
 [product-screenshot]: images/screenshot.png
-[n8n.js]: https://img.shields.io/badge/n8n.js-000000?style=for-the-badge&logo=n8n&logoColor=white
+[n8n.js]: https://img.shields.io/badge/n8n-io-green
 [n8n-url]: https://n8n.io/
-[JavaScript.js]: https://img.shields.io/badge/JavaScript-20232A?style=for-the-badge&logo=JavaScript&logoColor=61DAFB
+[JavaScript.js]: https://img.shields.io/badge/JS-JavaScript-green
 [JavaScript-url]: https://openjsf.org/
 [Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
 [Vue-url]: https://vuejs.org/
