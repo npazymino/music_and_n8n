@@ -1,7 +1,7 @@
 # Music and n8n
 My n8n automations for sharing, organizing and enjoying music.
 
-[![MIT License][license-shield]][license-url]
+[![Apache 2.0 License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
@@ -137,7 +137,7 @@ Project Link: [/npazymino/music_and_n8n](https://github.com/npazymino/npazymino/
 [issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
 [issues-url]: https://github.com/github_username/repo_name/issues
 [license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/npazymino/music_and_n8n/blob/master/LICENSE.txt
+[license-url]: https://github.com/npazymino/music_and_n8n/blob/master/LICENSE
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/npazymino
 [product-screenshot]: images/screenshot.png
