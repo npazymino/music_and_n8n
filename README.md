@@ -5,7 +5,7 @@ My n8n automations for sharing, organizing and enjoying music.
 [![LinkedIn][linkedin-shield]][linkedin-url]
 
 
-<h3 align="center">Music and N8N Automation Flows/h3>
+<h3 align="center">Music and N8N Automation Flows </h3>
 
   <p align="center">
     This set of N8N flows will let you share, organize and enjoy music.
@@ -19,21 +19,12 @@ My n8n automations for sharing, organizing and enjoying music.
 <details>
   <summary>Table of Contents</summary>
   <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
+    <a href="#about-the-project">About The Project</a>
+    <li><a href="#built-with">Built With</a></li>
+    <li><a href="#getting-started">Getting Started</a></li>
+    <li><a href="#prerequisites">Prerequisites</a></li>
+    <li><a href="#installation">Installation</a></li>
     <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
   </ol>
@@ -44,11 +35,7 @@ My n8n automations for sharing, organizing and enjoying music.
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
-
-Here's a blank template to get started: To avoid retyping too much info. Do a search and replace with your text editor for the following: `
-npazymino`, `npazymino/music_and_n8n`, `twitter_handle`, `linkedin_username`, `email_client`, `email`, `project_title`, `project_description`
-
+The project consists of a set of flows that will let you organize, share and enjoy your music. The flows were created in n8n, an open source automation tool.
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
@@ -91,6 +78,18 @@ You'll need an n8n account, the desktop application installed or a cloud user ac
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+
+Brief explanation of each flow:
+
+EmptyPlaylist.json
+PutTracksInSpotifyPlaylist.json
+PromoteArtistOnTwitter.json
+AlbumsFromSpotifyPlaylist.json
+ShareAlbumOfTheYearOnTwitterFromFile.json
+SeveralPlaylistsToFile.json
+DivideSpotifyPlaylistByReleaseYearV2.json
+
+
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
