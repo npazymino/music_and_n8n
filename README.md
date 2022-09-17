@@ -70,7 +70,9 @@ You'll need an n8n account, the desktop application installed or a cloud user ac
 1. Install n8n at [https://n8n.io](https://n8n.io/cloud?ref=nelsonpazymino&utm_source=affiliate)
 2. Get a free API Key from Spotify [https://spotify.com](https://developer.spotify.com/documentation/web-api/)
 3. Get a free API Key from YouTube [https://youtube.com](https://console.cloud.google.com/apis/dashboard)
-4. Get a free API Key from Twitter [https://twitter.com](https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api)     
+4. Get a free API Key from Twitter [https://twitter.com](https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api)
+5. Copy the JSON files and open then in n8n (desktop/cloud). 
+6. Customize with own credentials and playlist URIs/IDs.     
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -135,9 +137,9 @@ Project Link: [/npazymino/music_and_n8n](https://github.com/npazymino/npazymino/
 [issues-shield]: https://img.shields.io/github/issues/github_username/repo_name.svg?style=for-the-badge
 [issues-url]: https://github.com/github_username/repo_name/issues
 [license-shield]: https://img.shields.io/github/license/github_username/repo_name.svg?style=for-the-badge
-[license-url]: https://github.com/github_username/repo_name/blob/master/LICENSE.txt
+[license-url]: https://github.com/npazymino/music_and_n8n/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
-[linkedin-url]: https://linkedin.com/in/linkedin_username
+[linkedin-url]: https://linkedin.com/in/npazymino
 [product-screenshot]: images/screenshot.png
 [Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
 [Next-url]: https://nextjs.org/
