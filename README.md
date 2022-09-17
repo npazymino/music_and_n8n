@@ -8,7 +8,7 @@ My n8n automations for sharing, organizing and enjoying music.
 <h3 align="center">Music and N8N Automation Flows </h3>
 
   <p align="center">
-    This set of N8N flows will let you share, organize and enjoy music.
+    This set of N8N flows will let you share, organize and enjoy your music.
     <br />
   </p>
 </div>
@@ -143,10 +143,10 @@ Project Link: [/npazymino/music_and_n8n](https://github.com/npazymino/npazymino/
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=for-the-badge&logo=linkedin&colorB=555
 [linkedin-url]: https://linkedin.com/in/npazymino
 [product-screenshot]: images/screenshot.png
-[Next.js]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[Next-url]: https://nextjs.org/
-[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
-[React-url]: https://reactjs.org/
+[n8n.js]: https://img.shields.io/badge/n8n.js-000000?style=for-the-badge&logo=n8n&logoColor=white
+[n8n-url]: https://n8n.io/
+[JavaScript.js]: https://img.shields.io/badge/JavaScript-20232A?style=for-the-badge&logo=JavaScript&logoColor=61DAFB
+[JavaScript-url]: https://https://openjsf.org/
 [Vue.js]: https://img.shields.io/badge/Vue.js-35495E?style=for-the-badge&logo=vuedotjs&logoColor=4FC08D
 [Vue-url]: https://vuejs.org/
 [Angular.io]: https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white
