@@ -10,14 +10,6 @@ My n8n automations for sharing, organizing and enjoying music.
   <p align="center">
     This set of N8N flows will let you share, organize and enjoy music.
     <br />
-    <a href="https://github.com/github_username/repo_name"><strong>Explore the docs »</strong></a>
-    <br />
-    <br />
-    <a href="https://github.com/github_username/repo_name">View Demo</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Report Bug</a>
-    ·
-    <a href="https://github.com/github_username/repo_name/issues">Request Feature</a>
   </p>
 </div>
 
@@ -74,23 +66,24 @@ npazymino`, `npazymino/music_and_n8n`, `twitter_handle`, `linkedin_username`, `e
 <!-- GETTING STARTED -->
 ## Getting Started
 
-You'll need an n8n account, the desktop application installed or a cloud account.
+You'll need an n8n account, the desktop application installed or a cloud user account.
 
 ### Prerequisites
 
-JavaScript basic knowledge
-Algorithms basic knowledge
-Control flow basic knowledge
-Spotify API credentials
-YouTube API credentials
-Twitter API credentials
+1. JavaScript basic knowledge
+2. Algorithms basic knowledge
+3. Control flow basic knowledge
+4. Spotify API credentials
+5. YouTube API credentials
+6. Twitter API credentials
+
 
 ### Installation
 
-1. Install n8n at [https://n8n.io/cloud?ref=nelsonpazymino&utm_source=affiliate](https://n8n.io)
-2. Get a free API Key from Spotify [https://developer.spotify.com/documentation/web-api/](https://n8n.io)
-3. Get a free API Key from YouTube [https://console.cloud.google.com/apis/dashboard](https://youtube.com)
-4. Get a free API Key from Twitter [https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api](https://twitter.com)     
+1. Install n8n at [https://n8n.io](https://n8n.io/cloud?ref=nelsonpazymino&utm_source=affiliate)
+2. Get a free API Key from Spotify [https://spotify.com](https://developer.spotify.com/documentation/web-api/)
+3. Get a free API Key from YouTube [https://youtube.com](https://console.cloud.google.com/apis/dashboard)
+4. Get a free API Key from Twitter [https://twitter.com](https://developer.twitter.com/en/docs/twitter-api/getting-started/getting-access-to-the-twitter-api)     
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -116,9 +109,9 @@ Distributed under the MIT License. See `LICENSE.txt` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Your Name - [@twitter_handle](https://twitter.com/nelo_1980) - npazymino@gmail.com
+Your Name - [@nelo_1980](https://twitter.com/nelo_1980) - npazymino@gmail.com
 
-Project Link: [https://github.com/npazymino/npazymino/music_and_n8n](https://github.com/npazymino/npazymino/music_and_n8n)
+Project Link: [/npazymino/music_and_n8n](https://github.com/npazymino/npazymino/music_and_n8n)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
