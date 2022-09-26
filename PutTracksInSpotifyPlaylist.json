@@ -25,7 +25,7 @@
     },
     {
       "parameters": {
-        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      prefix: \"The Best Guitar Solos of \",\n      destinationPlaylist: \"7sEbs0ys6lFzZ7cruvWMPV\"\n    }\n  }\n];"
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      filter: \"The Best Guitar Solos of\",\n      prefix: \"The Best Guitar Solos of\",\n      destinationPlaylist: \"7sEbs0ys6lFzZ7cruvWMPV\"\n    }\n  }\n];"
       },
       "name": "Parameters",
       "type": "n8n-nodes-base.function",
@@ -38,26 +38,6 @@
     {
       "parameters": {
         "resource": "playlist",
-        "operation": "get",
-        "id": "={{$json[\"id\"]}}"
-      },
-      "name": "PlayList",
-      "type": "n8n-nodes-base.spotify",
-      "typeVersion": 1,
-      "position": [
-        -1260,
-        -220
-      ],
-      "credentials": {
-        "spotifyOAuth2Api": {
-          "id": "1",
-          "name": "Spotify account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "resource": "playlist",
         "operation": "getTracks",
         "id": "={{$json[\"id\"]}}",
         "returnAll": true
@@ -66,7 +46,7 @@
       "type": "n8n-nodes-base.spotify",
       "typeVersion": 1,
       "position": [
-        -1100,
+        -1220,
         -220
       ],
       "credentials": {
@@ -106,28 +86,6 @@
       "typeVersion": 1,
       "position": [
         -1420,
-        -220
-      ]
-    },
-    {
-      "parameters": {},
-      "name": "FunctionItem",
-      "type": "n8n-nodes-base.functionItem",
-      "typeVersion": 1,
-      "position": [
-        -220,
-        -180
-      ]
-    },
-    {
-      "parameters": {
-        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n//let FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"prefix\"];\nlet VArrayLength = items.length;\n\nfor (item of items) {\n  //const PlaylistKey = item.json.name;\n\n\n      let CTrackName = item.json.track.name;\n      let CTrackURI = item.json.track.uri;\n      let CArtistName = item.json.track.artists[0].name;\n\n      var ArrayTemp = {VTrackURI : CTrackURI, ArtistName : CArtistName, TrackName : CTrackName};\n\n\n    //if (PlaylistKey.includes(FiltroPlaylist)) {\n\n      results.push({json:ArrayTemp});\n      //results.unshift({json:item.json});\n\n  //}\n\n  \n\n  \n}\n\nreturn results;\n//ESTE FUNCIONA"
-      },
-      "name": "Filtrado3",
-      "type": "n8n-nodes-base.function",
-      "typeVersion": 1,
-      "position": [
-        -960,
         -220
       ]
     },
@@ -187,6 +145,45 @@
         -960,
         -520
       ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n//let FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"filter\"];\nlet VArrayLength = items.length;\n\nfor (item of items) {\n  //const PlaylistKey = item.json.name;\n\n      let CTrackName = item.json.track.name;\n      let CTrackURI = item.json.track.uri;\n      let CArtistName = item.json.track.artists[0].name;\n\n      var ArrayTemp = {VTrackURI : CTrackURI, ArtistName : CArtistName, TrackName : CTrackName};\n\n    //if (PlaylistKey.includes(FiltroPlaylist)) {\n\n      results.push({json:ArrayTemp});\n      //results.unshift({json:item.json});\n  //} \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "FillAll",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -1020,
+        -220
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const allData = []\n\nlet counter = 0;\ndo {\n  try {\n    const items = $items(\"Item Lists\", 0, counter);\n    //allData.push.apply(allData, items);\n\nallData.push.apply(allData, items);\n\n  } catch (error) {\n    return allData;  \n  }\n\n  counter++;\n} while(true);\n\n"
+      },
+      "name": "Function4",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        -180
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "fileFormat": "xlsx",
+        "options": {}
+      },
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        80,
+        -180
+      ],
+      "alwaysOutputData": true
     }
   ],
   "connections": {
@@ -212,22 +209,11 @@
         ]
       ]
     },
-    "PlayList": {
-      "main": [
-        [
-          {
-            "node": "PlaylistTracks",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
     "IF2": {
       "main": [
         [
           {
-            "node": "FunctionItem",
+            "node": "Function4",
             "type": "main",
             "index": 0
           }
@@ -245,7 +231,7 @@
       "main": [
         [
           {
-            "node": "Filtrado3",
+            "node": "FillAll",
             "type": "main",
             "index": 0
           }
@@ -257,17 +243,6 @@
         [
           {
             "node": "Spotify1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Filtrado3": {
-      "main": [
-        [
-          {
-            "node": "Item Lists",
             "type": "main",
             "index": 0
           }
@@ -289,7 +264,29 @@
       "main": [
         [
           {
-            "node": "PlayList",
+            "node": "PlaylistTracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify1": {
+      "main": [
+        [
+          {
+            "node": "IF2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FillAll": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
             "type": "main",
             "index": 0
           }
@@ -307,11 +304,11 @@
         ]
       ]
     },
-    "Spotify1": {
+    "Function4": {
       "main": [
         [
           {
-            "node": "IF2",
+            "node": "Spreadsheet File",
             "type": "main",
             "index": 0
           }

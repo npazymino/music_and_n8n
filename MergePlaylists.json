@@ -1,0 +1,220 @@
+{
+  "name": "MergePlaylists",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -1460,
+        -440
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      originPlaylist: \"6RRmQR4YqjIjGyQN3EnQy4\",\n      destinationPlaylist: \"6apycQRWAMbowPs6WyMhf2\"\n    }\n  }\n];"
+      },
+      "name": "Parameters",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        -440
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "id": "={{$item(0).$node[\"Parameters\"].json[\"destinationPlaylist\"]}}",
+        "trackID": "={{$json[\"VTrackURI\"]}}",
+        "additionalFields": {}
+      },
+      "name": "Spotify1",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -420,
+        -440
+      ],
+      "alwaysOutputData": false,
+      "retryOnFail": false,
+      "maxTries": 2,
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      },
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "removeKeyMatches",
+        "propertyName1": "=VTrackURI",
+        "propertyName2": "=VTrackURI"
+      },
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 1,
+      "position": [
+        -620,
+        -440
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$json[\"originPlaylist\"]}}",
+        "returnAll": true
+      },
+      "name": "OriginPlaylistTracks",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -1080,
+        -520
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$json[\"destinationPlaylist\"]}}",
+        "returnAll": true
+      },
+      "name": "DestinationPlaylistTracks",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        -1080,
+        -360
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n//let FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"filter\"];\nlet VArrayLength = items.length;\n\nfor (item of items) {\n  //const PlaylistKey = item.json.name;\n\n      let CTrackName = item.json.track.name;\n      let CTrackURI = item.json.track.uri;\n      let CArtistName = item.json.track.artists[0].name;\n\n      var ArrayTemp = {VTrackURI : CTrackURI, ArtistName : CArtistName, TrackName : CTrackName};\n\n    //if (PlaylistKey.includes(FiltroPlaylist)) {\n\n      results.push({json:ArrayTemp});\n      //results.unshift({json:item.json});\n  //} \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "FilterOriginTracks",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -860,
+        -520
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n//let FiltroPlaylist = $item(0).$node[\"Parameters\"].json[\"filter\"];\nlet VArrayLength = items.length;\n\nfor (item of items) {\n  //const PlaylistKey = item.json.name;\n\n      let CTrackName = item.json.track.name;\n      let CTrackURI = item.json.track.uri;\n      let CArtistName = item.json.track.artists[0].name;\n\n      var ArrayTemp = {VTrackURI : CTrackURI, ArtistName : CArtistName, TrackName : CTrackName};\n\n    //if (PlaylistKey.includes(FiltroPlaylist)) {\n\n      results.push({json:ArrayTemp});\n      //results.unshift({json:item.json});\n  //} \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "FilterDestinationTracks",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -860,
+        -360
+      ]
+    }
+  ],
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parameters": {
+      "main": [
+        [
+          {
+            "node": "OriginPlaylistTracks",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "DestinationPlaylistTracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OriginPlaylistTracks": {
+      "main": [
+        [
+          {
+            "node": "FilterOriginTracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "DestinationPlaylistTracks": {
+      "main": [
+        [
+          {
+            "node": "FilterDestinationTracks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FilterOriginTracks": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "FilterDestinationTracks": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Spotify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "id": 22,
+  "tags": []
+}
