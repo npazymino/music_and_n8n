@@ -86,8 +86,8 @@ Brief explanation of each flow:
 **EmptyPlaylist.json**.- This flow will allow you to empty a Spotify playlist. Remove all the tracks and leave the playlist void. May take several executions if the playlist exceeds more than 256 tracks.
 ![image](https://user-images.githubusercontent.com/99626589/190836960-76b8ae83-6354-4a7a-901d-89d307375f0b.png)
 
-**PutTracksInSpotifyPlaylist.json**.- This flow will allow you to merge several playlists into a single Spotify playlist. The criteria must be edited as per needed.
-![image](https://user-images.githubusercontent.com/99626589/190836733-e18bd12e-1da1-4c7a-b65e-b75c7a327619.png)
+**PutTracksInSpotifyPlaylist.json**.- This flow will allow you to merge several playlists into a single Spotify playlist. The criteria must be edited as per needed, final result is an Excel file with all the tracks.
+![image](https://user-images.githubusercontent.com/99626589/192181948-eefa5432-d212-4565-a15f-71d21b7dfbfa.png)
 
 **PromoteArtistOnTwitter.json**.- This flow will allow you to share a Twitter thread with an artist Spotify playlist link and subsequent top 10 songs, one per tweet including a YouTube video. The criteria must be edited as per needed.
 ![image](https://user-images.githubusercontent.com/99626589/190836930-37b85a7f-007e-403e-9b16-aeaf1dfa366a.png)
@@ -105,6 +105,10 @@ Recommendation: Allow no more than 3 albums per day to avoid consuming all the Y
 
 **DivideSpotifyPlaylistByReleaseYearV2.json**.- This flow will allow you to divide a playlist into several playlists. The criteria must be edited as per needed, right now the criteria is _release year_ of the song.
 ![image](https://user-images.githubusercontent.com/99626589/190836866-edaed381-8cc6-4f91-9057-574a3299bd98.png)
+
+**MargePlaylists.json**.- This flow will allow you to merge one playlist into another excluding the duplicated tracks. Perfecto when you found a great playlist from someone else and you need to add the tracks to your own playlist.
+
+![image](https://user-images.githubusercontent.com/99626589/192182407-6c2b3f42-b933-45e9-a903-a1de4983bd97.png)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
