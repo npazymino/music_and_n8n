@@ -1,0 +1,174 @@
+{
+  "name": "CorregirNombresAlbumes",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "c4e7c8ba-c602-4d21-b75a-b1e610f23418",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        60,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\CorregirBaseNelo.txt"
+      },
+      "id": "1d08a301-92db-4e00-8d32-ea3d14339c4c",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        400,
+        220
+      ],
+      "id": "9f454c1f-c328-4a00-94df-ccd0143ab8f8"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{json: {\"data\" : $json[\"data\"].split(/\\r?\\n/)}}]"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        560,
+        220
+      ],
+      "id": "f4ae9cd4-adc5-49a1-af9c-6aceab8754f4"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        720,
+        220
+      ],
+      "id": "caca3827-9cb9-4329-ae90-68182d151eca"
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n\nconst substringsToRemove = [\n    /\\s*\\(Remastered\\)/g,\n    /\\s*\\(\\d{4} Remastered\\)/g,\n    /\\s*\\(Remastered \\d{4}\\)/g,\n    /\\s*\\(\\d{4} Remastered\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remastered\\s*\\d{4}\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remaster\\)/g,\n    /\\s*\\(\\d{4} Remaster\\)/g,\n    /\\s*\\(Remaster \\d{4}\\)/g,\n    /\\s*\\(\\d{4} Remaster\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remaster\\s*\\d{4}\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remix\\)/g,\n    /\\s*\\(\\d{4} Remix\\)/g,\n    /\\s*\\(Remix \\d{4}\\)/g,\n    /\\s*\\(\\d{4} Remix\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remix\\s*\\d{4}\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Deluxe Edition\\)/g,\n    /\\s*\\(Expanded Edition\\)/g,\n    /\\s*\\(Expanded\\)/g,\n    /\\s*\\[Expanded Edition\\]/g,\n    /\\s*\\(Deluxe\\)/g,\n    /\\s*\\(Deluxe Edition Remastered\\)/g,\n    /\\s*\\(Super Deluxe Edition\\)/g,\n    /\\s*\\(Deluxe Version\\)/g,\n    /\\s*\\(Deluxe Reissue\\)/g,\n    /\\s*\\(Super Deluxe\\)/g,\n    /\\s*\\(Bonus Track Version\\)/g,\n    /\\s*\\(International Version\\)/g,\n    /\\s*\\(Intl Only Version\\)/g,\n    /\\s*\\(Remasters Edition\\)/g,\n    /\\s*\\(Bonus Track Edition\\)/g,\n    /\\s*\\(Legacy Edition\\)/g,\n    /\\s*\\(Anniversary Edition\\)/g,\n    /\\s*\\(Anniversary Version\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Anniversary Edition\\)/g,\n    /\\s*\\- \\s*[A-Za-z0-9]+ Anniversary Edition/g,\n    /\\s*\\- Deluxe Edition/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Anniversary Version\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Anniversary ReMaster\\)/g,\n    /\\s*\\(Remastered and Expanded\\)/g,\n    /\\s*\\(Remastered with Bonus Tracks\\)/g,\n    /\\s*\\(Remixed and Remastered\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Version\\)/g,\n    /\\s*\\[Remixed and Remastered\\]/g,\n    /\\s*\\[Remastered\\]/g,\n    /\\s*\\[Expanded\\]/g,\n    /\\s*\\[Expanded Edition\\]/g,\n    /\\s*\\(Standard\\)/g,\n    /\\s*\\- Deluxe Edition/g,\n    /\\s*\\(Special Edition\\)/g,\n    /\\s*\\(Limited Edition\\)/g,\n    /\\s*\\(Definitive Edition\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Edition\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Version\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\s*[A-Za-z0-9]+ Edition\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\s*[A-Za-z0-9]+ Version\\)/g,\n    /\\s*\\(Reissue\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\- Remastered\\)/g,\n    /\\s*\\(Expanded and Remastered\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\/ Remastered\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\s*[A-Za-z0-9]+ Track Edition\\)/g\n  ];\n\n  // Iterate over the substrings and remove them from the input string\n\n\nfor (item of items) {\n  \nCAlbumName = item.json.data;\n  \n  for (const pattern of substringsToRemove) {\n    CAlbumName = CAlbumName.replace(pattern, '');\n  }\n\n  CAlbumName = CAlbumName.replace(/&quot;/g, \"'\");\n  CAlbumName = CAlbumName.replace(/&#39;/g, \"'\");\n  CAlbumName = CAlbumName.replace(/&amp;/g, \"and\");\n\n \n      var ArrayTemp = {AlbumName : CAlbumName};\n    \n      results.push({json:ArrayTemp});\n  \n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Filtrado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        880,
+        220
+      ],
+      "id": "f112dd8e-82c8-42e2-84b9-2499d5d137a3"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=echo {{$json[\"AlbumName\"]}} >>C:\\Users\\nelop\\OneDrive\\EternalRockBot\\BaseNeloCorregida.txt"
+      },
+      "id": "34ec3647-0109-47e7-ac53-f8f87e500a28",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        220
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "Filtrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrado": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "2c9b7b4f-ae3e-4f2d-8ebb-9f60d09fb0a4",
+  "id": 19,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

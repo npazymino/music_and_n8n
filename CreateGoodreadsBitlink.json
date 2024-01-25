@@ -1,0 +1,268 @@
+{
+  "name": "CreateGoodreadsBitlink",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "dc090358-07fc-43a9-b676-caa464cb7c08",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\RockBooks.txt"
+      },
+      "id": "f74a8337-89cb-47fc-9761-ae4b7ad48561",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        20
+      ],
+      "id": "e661b346-7310-4a7b-90aa-feaa4b1ab40b"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{json: {\"data\" : $json[\"data\"].split(/\\r?\\n/)}}]"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        120,
+        20
+      ],
+      "id": "bcc7a3cd-a14e-4690-b38b-fcd333bbf030"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        280,
+        20
+      ],
+      "id": "7213f41e-d269-4b0d-bc84-7edba7b23ed2"
+    },
+    {
+      "parameters": {
+        "longUrl": "={{ $json[\"data\"] }}",
+        "additionalFields": {
+          "title": "={{ $json[\"head title\"] }} #Book #eBook #RockBook"
+        }
+      },
+      "id": "151b8b63-a7fa-45bb-b35b-86c96e2b9c2b",
+      "name": "Bitly",
+      "type": "n8n-nodes-base.bitly",
+      "typeVersion": 1,
+      "position": [
+        180,
+        260
+      ],
+      "credentials": {
+        "bitlyApi": {
+          "id": "3",
+          "name": "Bitly account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "f81ef900-44f4-428e-8a1a-0249d2b94a8c",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        340,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "url": "={{ $json[\"data\"] }}",
+        "options": {}
+      },
+      "id": "2cb7be13-b24a-448d-8383-2efe81f7bb25",
+      "name": "HTTP Request",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -360,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "extractionValues": {
+          "values": [
+            {
+              "key": "head title",
+              "cssSelector": "head title"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "b0bd8c06-496e-4831-8205-14de6c03faf0",
+      "name": "HTML Extract",
+      "type": "n8n-nodes-base.htmlExtract",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        240
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "a80bc151-a738-40ad-97e6-33b96151775b",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        0,
+        260
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Bitly": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "HTML Extract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTML Extract": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Bitly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "a9687f91-7b1e-4020-9b53-a87bbd4a9ea4",
+  "id": 15,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

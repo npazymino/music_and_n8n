@@ -1,0 +1,157 @@
+{
+  "name": "TracksFromSpotifyPlaylist",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        340,
+        320
+      ],
+      "id": "fa366de4-34c5-4c3c-8e11-f92fbc5e544b"
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{$node[\"Function\"].json[\"playlist\"]}}",
+        "returnAll": true
+      },
+      "name": "Spotify1",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        660,
+        320
+      ],
+      "id": "a09a5d31-4358-4891-bb46-9ca9a7e548a2",
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      year: 2023,\n      playlist: \"6wWH6NM6eWeQHikZzJq5DD\"\n    }\n  }\n];"
+      },
+      "name": "Function",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        500,
+        320
+      ],
+      "id": "29147b45-1678-4cc8-bc1c-1f4aa88ad1da"
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nfor (item of items) {\n  \n  const CArtistName = item.json.track.artists[0].name;\n  const CAlbumName = item.json.track.album.name;\n  const CTrackURI = item.json.track.uri;\n  const CTrackName = item.json.track.name;\n  const CAlbumID = item.json.track.album.id;\n  \n  var ArrayTemp = {ArtistName : CArtistName, TrackName : CTrackName, AlbumName : CAlbumName, AlbumURI : CAlbumID, TrackURI : CTrackURI};\n    \n  results.push({json:ArrayTemp});\n\n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Filtrado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        800,
+        320
+      ],
+      "id": "81499148-f2eb-4673-a870-6a6a9992f77f"
+    },
+    {
+      "parameters": {
+        "operation": "removeDuplicates"
+      },
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        960,
+        320
+      ],
+      "id": "66e66919-3574-4318-959e-6710cd398c50"
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "options": {}
+      },
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        320
+      ],
+      "id": "beeb9709-b5e0-4189-995e-758a35f60398"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Function",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Function": {
+      "main": [
+        [
+          {
+            "node": "Spotify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify1": {
+      "main": [
+        [
+          {
+            "node": "Filtrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrado": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "cff4ba69-4c12-4320-8cc7-7d0c2ef6e353",
+  "id": 16,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

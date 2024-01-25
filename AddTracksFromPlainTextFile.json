@@ -1,0 +1,216 @@
+{
+  "name": "AddTracksFromPlainTextFile",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b5346658-909a-4294-a158-dc9cc5318f1e",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\TracksForPlaylist.txt"
+      },
+      "id": "f7f229af-5c97-4448-a46b-0d0352f3cb6e",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        320,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        560,
+        340
+      ],
+      "id": "1211e9cb-03f0-4708-8048-8e0f4eb54363"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{json: {\"data\" : $json[\"data\"].split(/\\r?\\n/)}}]"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        780,
+        340
+      ],
+      "id": "df02784b-0d89-4f23-91ac-7f28d5fa77a1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        980,
+        340
+      ],
+      "id": "0c2e3fb8-7a09-40ac-84ff-941dcbb5c5c7"
+    },
+    {
+      "parameters": {
+        "resource": "track",
+        "operation": "search",
+        "query": "={{ $json[\"data\"] }}",
+        "limit": 1,
+        "filters": {}
+      },
+      "id": "1a5e5953-8836-4dca-8a49-c16561563b92",
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        560
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "id": "=spotify:playlist:{{$item(0).$node[\"Parameters\"].json[\"destinationPlaylist\"]}}",
+        "trackID": "={{ $json[\"uri\"] }}",
+        "additionalFields": {}
+      },
+      "id": "df1bc22a-5ad8-4e97-91c0-565a76876c91",
+      "name": "Spotify1",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        1000,
+        720
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "return [\n  {\n    json: {\n      id: 1,\n      destinationPlaylist: \"0PiHYwgHNN4TsB6WgXNNc8\"\n    }\n  }\n];"
+      },
+      "name": "Parameters",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        140,
+        340
+      ],
+      "id": "fb9b81ae-3110-4eb8-a1b6-e563cf35f855"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Parameters",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "Spotify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify": {
+      "main": [
+        [
+          {
+            "node": "Spotify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parameters": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "4aaee86e-5151-4e17-bdc3-ff8e35a62809",
+  "id": 9,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

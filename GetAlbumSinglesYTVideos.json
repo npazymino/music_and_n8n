@@ -1,0 +1,506 @@
+{
+  "name": "GetAlbumSinglesYTVideos",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        -20
+      ],
+      "id": "6aef07a0-0449-484f-8227-4a4fe4c495aa"
+    },
+    {
+      "parameters": {
+        "resource": "album",
+        "operation": "getTracks",
+        "id": "={{ $json[\"data\"] }}",
+        "returnAll": true
+      },
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        480,
+        320
+      ],
+      "id": "db707bf9-379f-4d9a-9880-7881d1e3b02b",
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "var indice = $node[\"SplitInBatches\"].context[\"currentRunIndex\"];\nvar artist =  $item(0).$node[\"Spotify1\"].json[\"album\"][\"artists\"][0][\"name\"];\nvar album =  $item(0).$node[\"Spotify1\"].json[\"album\"][\"name\"];\nArtistaAlbum = artist + \" \" + album + \";\";\n\nvar SongTitle = $json[\"snippet\"][\"title\"];\n\nvar VideoURL = \"https://www.youtube.com/watch?v=\" + $json[\"id\"][\"videoId\"];\n\n//if (indice == 0) {\n//item.UltimoTweetID = null;\n//item.UltimoTweetID = $item(0).$node[\"TwitterPOST\"].json[\"id_str\"];\n//}\n//else  {\n//Supuestamente NODE TWITTER recibe multiples valores por eso siempre se apunta al cero.\n//item.UltimoTweetID = $item(0).$node[\"TwitterPOST1\"].json[\"id_str\"];\n//}\n\n//item.indiceSplit = indice;\n\nSongTitle = SongTitle.replace(/&quot;/g, \"'\");\nSongTitle = SongTitle.replace(/&#39;/g, \"'\");\nSongTitle = SongTitle.replace(/&amp;/g, \"and\");\nSongTitle = SongTitle.replace(/&/g, \"and\");\nSongTitle = SongTitle.replace(/\\|/g, \"'\");\n\nArtistaAlbum = ArtistaAlbum.replace(/&quot;/g, \"'\");\nArtistaAlbum = ArtistaAlbum.replace(/&#39;/g, \"'\");\nArtistaAlbum = ArtistaAlbum.replace(/&amp;/g, \"and\");\nArtistaAlbum = ArtistaAlbum.replace(/&/g, \"and\");\nArtistaAlbum = ArtistaAlbum.replace(/\\|/g, \"'\");\n\n\nitem.Tweet = ArtistaAlbum + SongTitle + \" #NowPlaying \" + VideoURL;\n\nreturn item;"
+      },
+      "name": "AgregarTweetID",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        360,
+        580
+      ],
+      "id": "d5a20a10-8416-4aff-a1ea-3fc4a7f14524"
+    },
+    {
+      "parameters": {
+        "resource": "track",
+        "operation": "get",
+        "id": "={{ $json[\"uri\"] }}"
+      },
+      "id": "07f6ddc6-7bd4-484f-910d-4523539e887b",
+      "name": "Spotify1",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        680,
+        320
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "sort",
+        "sortFieldsUi": {
+          "sortField": [
+            {
+              "fieldName": "popularity",
+              "order": "descending"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "36f291d3-3a16-4428-9a49-9a45660c0d3e",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        880,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "limit",
+        "maxItems": "=4"
+      },
+      "id": "a584c22a-953f-49f5-82f3-923b64643b6d",
+      "name": "Item Lists1",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Tweet",
+              "value": "={{ $json[\"Tweet\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": true
+        }
+      },
+      "id": "15e463af-0c21-4c13-92f1-51fb27f4c26a",
+      "name": "Set",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        540,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//var Artist = $json[\"artists\"][0][\"name\"];\n\n\n\nvar Song = $json[\"name\"];\n\nconst substringsToRemove = [\n    /\\s*-\\s*Remastered\\s*\\d{4}\\b/g,\n    /\\s*-\\s*Remaster\\s*\\d{4}\\b/g,\n    /\\s*-\\s*Remix\\s*\\d{4}\\b/g,\n    /\\s*-\\s*\\d{4}\\s*Remastered\\s*[A-Za-z]+\\b/g,\n    /\\s*-\\s*\\d{4}\\s*Remaster\\s*[A-Za-z]+\\b/g,\n    /\\s*-\\s*\\d{4}\\s*Remix\\s*[A-Za-z]+\\b/g,\n    /\\s*-\\s*\\d{4}\\s*Remastered\\b/g,\n    /\\s*-\\s*\\d{4}\\s*Remaster\\b/g,\n    /\\s*-\\s*\\d{4}\\s*Remix\\b/g,\n    /\\s*-\\s*Remastered\\b/g,       \n    /\\s*-\\s*Remaster\\b/g,         \n    /\\s*-\\s*Remix\\b/g\n  ];\n\n  // Iterate over the substrings and remove them from the input string\n  for (const pattern of substringsToRemove) {\n    Song = Song.replace(pattern, '');\n  }\n\n\n\n\n//item.Artist = Artist;\nitem.Song = Song;\n\n\n\nreturn item;"
+      },
+      "name": "AgregarTweetID1",
+      "type": "n8n-nodes-base.functionItem",
+      "typeVersion": 1,
+      "position": [
+        1260,
+        320
+      ],
+      "id": "12b90ed2-e8db-4e8f-971c-f3b6beecf322"
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\SinglesAlbumsFiles\\AlbumsURI.txt"
+      },
+      "id": "b0be7e57-1f6b-4b57-a92c-529f66b8e8ba",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        120,
+        -20
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\r\n  json: {\r\n    \"data\": $json[\"data\"].split(/\\r?\\n/).map(function(item) {\r\n      return item.trim();\r\n    }).filter(function(item) {\r\n      return item !== '';\r\n    })\r\n  }\r\n}];"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        440,
+        -20
+      ],
+      "id": "97f00bc1-91e4-4016-9b6b-d3a54a468150"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -20
+      ],
+      "id": "8d81d0b1-6e38-463c-822d-22340d4b5020"
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data1",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        280,
+        -20
+      ],
+      "id": "ff338254-6cd7-45aa-a878-fc633e560b31"
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        300,
+        320
+      ],
+      "id": "e84eb115-5ac9-4d4d-86ef-24606794cfd2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "operation": "=equal",
+              "value2": "={{$node[\"SplitInBatches\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        300
+      ],
+      "id": "b33c0a6c-026a-42fd-af4c-b5e529ff5de0"
+    },
+    {
+      "parameters": {},
+      "id": "a4e53d51-ab51-4756-983e-f5b5214c3a0a",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        120,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "command": "break>C:\\Users\\nelop\\OneDrive\\EternalRockBot\\SinglesAlbumsFiles\\AlbumsURI.txt"
+      },
+      "id": "5139d8bd-c262-4f3a-91c8-989f8fee9e82",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=echo {{$json[\"Tweet\"]}}>>C:\\Users\\nelop\\OneDrive\\EternalRockBot\\SinglesAlbumsFiles\\Singles.txt"
+      },
+      "id": "449cb0fe-5f47-43a8-9073-6760a59edd04",
+      "name": "Execute Command1",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        740,
+        580
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "video",
+        "limit": 1,
+        "filters": {
+          "q": "={{$json[\"artists\"][0][\"name\"]}} {{$json[\"Song\"]}} Official Video",
+          "videoType": "any"
+        },
+        "options": {
+          "order": "relevance"
+        }
+      },
+      "id": "5e197ae6-8450-4a29-aa92-3a4538f31240",
+      "name": "YouTube1",
+      "type": "n8n-nodes-base.youTube",
+      "typeVersion": 1,
+      "position": [
+        1460,
+        320
+      ],
+      "credentials": {
+        "youTubeOAuth2Api": {
+          "id": "4",
+          "name": "YouTube account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Spotify": {
+      "main": [
+        [
+          {
+            "node": "Spotify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify1": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Item Lists1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists1": {
+      "main": [
+        [
+          {
+            "node": "AgregarTweetID1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgregarTweetID": {
+      "main": [
+        [
+          {
+            "node": "Set",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AgregarTweetID1": {
+      "main": [
+        [
+          {
+            "node": "YouTube1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data1": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [
+          {
+            "node": "Spotify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "YouTube1": {
+      "main": [
+        [
+          {
+            "node": "AgregarTweetID",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1fbe517f-3f9e-4356-a183-000e6b95d802",
+  "id": 10,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

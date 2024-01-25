@@ -1,0 +1,284 @@
+{
+  "name": "CreateSpotifyPlaylistBitlink",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cb4d6ac3-46e0-4b32-a2bd-7db0e96b3686",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "get",
+        "id": "={{ $json[\"newURI\"] }}"
+      },
+      "id": "ae2cf657-b90a-49c9-b493-086e1e5a13c7",
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        540,
+        20
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nfor (item of items) {\n  \n  //CPlaylistName = item.json.name + \" #SpotifyPlaylist #NowPlaying\";\n  CPlaylistName = item.json.name + \" \" + (item.json.description.length > 226 - item.json.name.length ? item.json.description.slice(0, 226 - item.json.name.length) : item.json.description) + \" #SpotifyPlaylist #NowPlaying\";\n  \n  \n  const CPlaylistDesc = item.json.description;\n  const CPlaylistLink = item.json.external_urls.spotify;\n  const CPlaylistNoFollowers = item.json.followers.total;\n\n  \n\n  CPlaylistName = CPlaylistName.replace(/&quot;/g, \"'\");\n  CPlaylistName = CPlaylistName.replace(/&#39;/g, \"'\");\n  CPlaylistName = CPlaylistName.replace(/&amp;/g, \"and\");\n  CPlaylistName = CPlaylistName.replace(/&/g, \"and\");\n\n      var ArrayTemp = {PlaylistName : CPlaylistName, PlaylistDesc : CPlaylistDesc, PlaylistLink : CPlaylistLink, PlaylistNoFollowers : CPlaylistNoFollowers};\n    \n      results.push({json:ArrayTemp});\n  \n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Filtrado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        260
+      ],
+      "id": "b305f7c8-c241-422c-a156-a97bfaf74784"
+    },
+    {
+      "parameters": {
+        "operation": "removeDuplicates"
+      },
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        260
+      ],
+      "id": "c9c563bd-6358-4360-80bd-4468d8fa1373"
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nfor (item of items) {\n  \nconst CPlaylistURI = item.json.data;\n\n    // Split the URL by '/' to get individual parts\nconst parts = CPlaylistURI.split('/');\n    // Extract the playlist ID from the URL\nconst playlistIDTemp = parts[parts.length - 1];\n    // Construct the new format\nconst parts2 = playlistIDTemp.split('?');\n    // Extract the playlist ID from the URL\nconst playlistID = parts2[parts2.length - 2];\n    // Construct the new format\n\nconst CnewURI = \"spotify:playlist:\" + playlistID;\n\n//CnewURL = CnewURL.split('?')[0];\n\nvar ArrayTemp = {newURI : CnewURI};\n    \nresults.push({json:ArrayTemp});  \n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "CrearURI",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        400,
+        20
+      ],
+      "id": "c5370dfa-c555-4493-9615-be4a9034972e"
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\PlaylistsAjenas2.txt"
+      },
+      "id": "86a3079b-3c06-423e-b0eb-33ad6b2a3e22",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -180,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        -20,
+        20
+      ],
+      "id": "952d9116-8b6e-4ea5-929a-7aba01fdf1b3"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{json: {\"data\" : $json[\"data\"].split(/\\r?\\n/)}}]"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        120,
+        20
+      ],
+      "id": "00d89e6f-a5ef-41dc-924e-bc55828de8c5"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        260,
+        20
+      ],
+      "id": "76e72c2e-e78b-4b09-9389-0f7e80c067a1"
+    },
+    {
+      "parameters": {
+        "longUrl": "={{ $json[\"PlaylistLink\"] }}",
+        "additionalFields": {
+          "title": "={{ $json[\"PlaylistName\"] }}"
+        }
+      },
+      "id": "e9b32da2-f116-4c38-ac86-554acda60cba",
+      "name": "Bitly",
+      "type": "n8n-nodes-base.bitly",
+      "typeVersion": 1,
+      "position": [
+        80,
+        260
+      ],
+      "credentials": {
+        "bitlyApi": {
+          "id": "3",
+          "name": "Bitly account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "795d5519-33a6-48cd-a057-4ab262a64aa0",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        260,
+        260
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Filtrado": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "CrearURI",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrearURI": {
+      "main": [
+        [
+          {
+            "node": "Spotify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify": {
+      "main": [
+        [
+          {
+            "node": "Filtrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Bitly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bitly": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "50e08b77-0358-4feb-8376-d4a1aa9e79ea",
+  "id": 8,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

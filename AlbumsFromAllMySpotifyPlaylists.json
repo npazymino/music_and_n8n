@@ -1,0 +1,381 @@
+{
+  "name": "AlbumsFromAllMySpotifyPlaylists",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Start",
+      "type": "n8n-nodes-base.start",
+      "typeVersion": 1,
+      "position": [
+        -200,
+        160
+      ],
+      "id": "e496ea7b-684f-4479-9843-e9682ec9c949"
+    },
+    {
+      "parameters": {
+        "resource": "playlist",
+        "operation": "getTracks",
+        "id": "={{ $json[\"data\"] }}",
+        "returnAll": true
+      },
+      "name": "Spotify1",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        480,
+        240
+      ],
+      "id": "9bd142ca-c700-464c-8deb-0c81b88d2365",
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nfor (item of items) {\n  \n  const CAlbumName = item.json.track.album.name;\n  const CAlbumType = item.json.track.album.album_type;\n  const CAlbumReleaseDate = item.json.track.album.release_date;\n  const CAlbumID = item.json.track.album.id;\n  const CArtistName = item.json.track.artists[0].name;\n \n    if (CAlbumType == \"album\" ) {\n\n      var ArrayTemp = {AlbumID : CAlbumID, ArtistName : CArtistName, AlbumName : CAlbumName, ReleaseDate : CAlbumReleaseDate};\n    \n      results.push({json:ArrayTemp});\n  }\n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Filtrado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        660,
+        240
+      ],
+      "id": "29dd4eb0-2b62-49f1-a8e7-dba05ae0762a"
+    },
+    {
+      "parameters": {
+        "operation": "removeDuplicates"
+      },
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        860,
+        240
+      ],
+      "id": "9f32524d-f468-4c16-958c-8ff7d5bbc2df"
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        120,
+        160
+      ],
+      "id": "aa7cb14c-1ec6-4213-a04d-e67271b35bef"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\r\n  json: {\r\n    \"data\": $json[\"data\"].split(/\\r?\\n/).map(function(item) {\r\n      return item.trim().replace(/&/g, \"and\");\r\n    }).filter(function(item) {\r\n      return item !== '';\r\n    })\r\n  }\r\n}];"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        360
+      ],
+      "id": "343a980b-c8e3-40f9-a1f9-1a4e047cb76d"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        120,
+        360
+      ],
+      "id": "f85ac155-bdb9-42d2-9724-577c90abdbb8"
+    },
+    {
+      "parameters": {
+        "resource": "album",
+        "id": "=spotify:album:{{ $json[\"AlbumID\"] }}"
+      },
+      "id": "6cd178e5-453f-4183-99e8-b7034bcb6e37",
+      "name": "Spotify2",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        1060,
+        240
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "const results = [];\r\n\r\nfor (item of items) {\r\n\r\nTempText = item.json.external_urls.spotify + \";\" + item.json.artists[0].name + \";\" + item.json.name + \";\" + item.json.images[0].url+ \";\" + item.json.release_date;\r\nTempText= TempText.trim().replace(/&/g, \"and\");\r\n\r\nvar ArrayTemp = {data : TempText};\r\n    \r\nresults.push({json:ArrayTemp});  \r\n  \r\n}\r\n\r\nreturn results;"
+      },
+      "name": "TrimReplace",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        480
+      ],
+      "id": "efbbd39a-531c-44b6-b747-00a542cc757c"
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\PlaylistXAnio.txt"
+      },
+      "id": "c3e9a513-1deb-41e2-beea-94bd3b255ac5",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -40,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "boolean": [
+            {
+              "value1": true,
+              "operation": "=equal",
+              "value2": "={{$node[\"SplitInBatches\"].context[\"noItemsLeft\"]}}"
+            }
+          ]
+        }
+      },
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        80,
+        620
+      ],
+      "id": "1444d4a5-92f0-4067-99bf-df9fa92268cf"
+    },
+    {
+      "parameters": {},
+      "id": "9585443d-e7f9-47a6-a296-33a9c56ceb6d",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        360,
+        600
+      ]
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=echo {{$json[\"data\"]}} >> C:\\Users\\nelop\\OneDrive\\EternalRockBot\\AlbumReleaseDate\\AllAlbumsURI.txt"
+      },
+      "id": "08b5e53d-e79c-4d38-9921-d6050dd1e1fa",
+      "name": "Execute Command1",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        1080,
+        680
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {
+          "reset": false
+        }
+      },
+      "id": "aa5f9fb9-0076-4b8d-8071-ba353bbb456a",
+      "name": "SplitInBatches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        300,
+        360
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify1": {
+      "main": [
+        [
+          {
+            "node": "Filtrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrado": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify2": {
+      "main": [
+        [
+          {
+            "node": "TrimReplace",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "SplitInBatches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Spotify2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TrimReplace": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Command1": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SplitInBatches": {
+      "main": [
+        [
+          {
+            "node": "Spotify1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "b484aa02-6231-4aca-a68b-2163d99a3b65",
+  "id": 17,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": [
+    {
+      "createdAt": "2024-01-16T17:48:56.352Z",
+      "updatedAt": "2024-01-16T17:48:56.352Z",
+      "id": "1",
+      "name": "Spotify"
+    }
+  ]
+}

@@ -1,0 +1,251 @@
+{
+  "name": "CreateAlbumListFromPlainTextFile",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "8f94d09d-6c24-4d48-948d-af6801fe0284",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        120,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\SinglesAlbumsFiles\\AlbumsRAW.txt"
+      },
+      "id": "40f03e3c-f0c3-4f6f-a488-ab10129d4757",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        320,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        560,
+        340
+      ],
+      "id": "4f007c08-3694-443e-9b97-7f3c5d353495"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{\r\n  json: {\r\n    \"data\": $json[\"data\"].split(/\\r?\\n/).map(function(item) {\r\n      return item.trim().replace(/&/g, \"and\");\r\n    }).filter(function(item) {\r\n      return item !== '';\r\n    })\r\n  }\r\n}];"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        780,
+        340
+      ],
+      "id": "cf91338c-d0f0-445c-8c38-bd321a31b25b"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        980,
+        340
+      ],
+      "id": "5e4f2d4d-979b-4637-a694-9932c0a19447"
+    },
+    {
+      "parameters": {
+        "resource": "album",
+        "operation": "search",
+        "query": "={{ $json[\"data\"] }}",
+        "limit": 1,
+        "filters": {}
+      },
+      "id": "cccfde49-b93c-4027-8c21-ee2b5886f496",
+      "name": "Spotify2",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        100,
+        540
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=echo {{ $json[\"data\"] }}>>C:\\Users\\nelop\\OneDrive\\EternalRockBot\\Albums.txt  "
+      },
+      "id": "e0e2d5b1-0088-4b04-9b9a-c328473c123e",
+      "name": "Execute Command",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        500,
+        540
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "const results = [];\r\n\r\nfor (item of items) {\r\n\r\nTempText = item.json.external_urls.spotify + \";\" + item.json.artists[0].name + \";\" + item.json.name + \";\" + item.json.images[0].url+ \";\" + item.json.release_date;\r\nTempText= TempText.trim().replace(/&/g, \"and\");\r\n\r\nvar ArrayTemp = {data : TempText};\r\n    \r\nresults.push({json:ArrayTemp});  \r\n  \r\n}\r\n\r\nreturn results;"
+      },
+      "name": "TrimReplace",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        300,
+        540
+      ],
+      "id": "80867a6f-6482-4ebd-9ef4-d684595ca861"
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n\nfor (item of items) {\n\nconst CAlbumURI = item.json.data;\n\nconst AlbumID =CAlbumURI.slice(31, 53);\n\nconst CnewURI = \"spotify:album:\" + AlbumID;\n\nvar ArrayTemp = {newURI : CnewURI, newAlbumID: AlbumID};\n    \nresults.push({json:ArrayTemp});  \n  \n}\n\nreturn results;"
+      },
+      "name": "CrearURI1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        500,
+        740
+      ],
+      "id": "e8c0e840-7d48-459c-9db5-68dc9fee7d23"
+    },
+    {
+      "parameters": {
+        "executeOnce": false,
+        "command": "=echo {{$json[\"newAlbumID\"]}} >> C:\\Users\\nelop\\OneDrive\\EternalRockBot\\SinglesAlbumsFiles\\AlbumsURI.txt"
+      },
+      "id": "f94a4457-7ef0-45ee-9ea5-7b2851e6fa2e",
+      "name": "Execute Command1",
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        700,
+        740
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "Spotify2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify2": {
+      "main": [
+        [
+          {
+            "node": "TrimReplace",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "TrimReplace": {
+      "main": [
+        [
+          {
+            "node": "Execute Command",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "CrearURI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrearURI1": {
+      "main": [
+        [
+          {
+            "node": "Execute Command1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "929a4fc1-5cbe-4bc7-8400-5b30790ce7df",
+  "id": 13,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

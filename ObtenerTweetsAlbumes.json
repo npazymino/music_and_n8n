@@ -1,0 +1,174 @@
+{
+  "name": "ObtenerTweetsAlbumes",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "e4118884-fd65-4fa7-895a-6ae82757c641",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        60,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\ObtenerDatosTweets.txt"
+      },
+      "id": "d8304f19-ca96-47a0-a547-9316231ea6a6",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        220,
+        220
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        400,
+        220
+      ],
+      "id": "afaa9343-576a-46d3-bdba-de8001e3352d"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{json: {\"data\" : $json[\"data\"].split(/\\r?\\n/)}}]"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        560,
+        220
+      ],
+      "id": "8fd22b0d-5f4b-4cb4-8c50-50720b74d5a6"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        720,
+        220
+      ],
+      "id": "4cb8c941-e170-4c98-99eb-9b1424e1a982"
+    },
+    {
+      "parameters": {
+        "functionCode": "const results = []; \n for (item of items) {\n  const regex = /(.+?) - (?:Classic\\s*|New\\s*|Groundbreaking\\s*)?(Album|album) by (.+?), released\\s*(.+)/;\n  //const regex = /(.+?) – Album by (.+?),.*?(\\b\\w+\\b)?(?: (\\d{2}-[A-Za-z]+-\\d{4}|\\d{2}-[A-Za-z]+-\\d{2,4}))/i;\n  const match = item.json.data.match(regex);\n  var formattedDate = '0000-00-00'\n if (match) {\n    const [, albumName, albumtype, artistName, hashtags] = match;\n    const releaseDate = hashtags.match(/\\d{2}-[A-Za-z]+-\\d{4}/g);\n    try{\n    formattedDate = new Date(releaseDate).toISOString().split('T')[0];\n    } catch (error) {\n      console.error('Error converting releaseDate to formattedDate:', error);\n      // Handle the error, or you can choose to continue without setting formattedDate\n    }\n    const hashtagArray = hashtags.match(/#[^\\s#]+/g) || [];\n    const twitterHandleMatch = artistName.match(/@(\\w+)/);\n    const TwitterHandle = twitterHandleMatch ? twitterHandleMatch[1] : null;\n    VartistName = artistName.replace(/@\\w+/, '').trim();\n    var ArrayTemp = {CArtistName : VartistName, CAlbumName : albumName, CTwitterHandle : \"@\" + TwitterHandle, CReleaseDate : formattedDate};\n    \n    results.push({json:ArrayTemp});\n    \n  } else {\n    var ArrayTemp = {CArtistName : \"\", CAlbumName : \"\", CTwitterHandle : \"\", CReleaseDate : \"\"}; \n    results.push({json:ArrayTemp});\n  }\n}\n\nreturn results;"
+      },
+      "name": "Filtrado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        880,
+        220
+      ],
+      "id": "1110279f-3d3d-4a3e-8648-5459e858496c"
+    },
+    {
+      "parameters": {
+        "operation": "toFile",
+        "options": {}
+      },
+      "id": "8a4b6a6e-35a9-4b17-99a5-fa50d2d5d9ad",
+      "name": "Spreadsheet File",
+      "type": "n8n-nodes-base.spreadsheetFile",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        220
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "Filtrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filtrado": {
+      "main": [
+        [
+          {
+            "node": "Spreadsheet File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "e72d1c14-58cb-433a-8de1-b0a274745738",
+  "id": 21,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}

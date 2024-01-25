@@ -1,0 +1,283 @@
+{
+  "name": "CreateSpotifyAlbumBitlink",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "452c265d-225f-4121-8b01-24b489adf049",
+      "name": "When clicking \"Execute Workflow\"",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "album",
+        "id": "={{ $json[\"newURI\"] }}"
+      },
+      "id": "8d8901da-ac82-4ec9-a265-704d0d5679fb",
+      "name": "Spotify",
+      "type": "n8n-nodes-base.spotify",
+      "typeVersion": 1,
+      "position": [
+        640,
+        20
+      ],
+      "credentials": {
+        "spotifyOAuth2Api": {
+          "id": "1",
+          "name": "Spotify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\nconst months = [\n    'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',\n    'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'\n  ];\nconst substringsToRemove = [\n    /\\s*\\(Remastered\\)/g,\n    /\\s*\\(\\d{4} Remastered\\)/g,\n    /\\s*\\(Remastered \\d{4}\\)/g,\n    /\\s*\\(\\d{4} Remastered\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remastered\\s*\\d{4}\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remaster\\)/g,\n    /\\s*\\(\\d{4} Remaster\\)/g,\n    /\\s*\\(Remaster \\d{4}\\)/g,\n    /\\s*\\(\\d{4} Remaster\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remaster\\s*\\d{4}\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remix\\)/g,\n    /\\s*\\(\\d{4} Remix\\)/g,\n    /\\s*\\(Remix \\d{4}\\)/g,\n    /\\s*\\(\\d{4} Remix\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Remix\\s*\\d{4}\\s*[A-Za-z0-9]+\\)/g,\n    /\\s*\\(Deluxe Edition\\)/g,\n    /\\s*\\(Expanded Edition\\)/g,\n    /\\s*\\[Expanded Edition\\]/g,\n    /\\s*\\(Deluxe\\)/g,\n    /\\s*\\(Deluxe Edition Remastered\\)/g,\n    /\\s*\\(Super Deluxe Edition\\)/g,\n    /\\s*\\(Deluxe Version\\)/g,\n    /\\s*\\(Deluxe Reissue\\)/g,\n    /\\s*\\(Super Deluxe\\)/g,\n    /\\s*\\(Bonus Track Version\\)/g,\n    /\\s*\\(International Version\\)/g,\n    /\\s*\\(Intl Only Version\\)/g,\n    /\\s*\\(Remasters Edition\\)/g,\n    /\\s*\\(Bonus Track Edition\\)/g,\n    /\\s*\\(Legacy Edition\\)/g,\n    /\\s*\\(Anniversary Edition\\)/g,\n    /\\s*\\(Anniversary Version\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Anniversary Edition\\)/g,\n    /\\s*\\- \\s*[A-Za-z0-9]+ Anniversary Edition/g,\n    /\\s*\\- Deluxe Edition/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Anniversary Version\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Anniversary ReMaster\\)/g,\n    /\\s*\\(Remastered and Expanded\\)/g,\n    /\\s*\\(Remastered with Bonus Tracks\\)/g,\n    /\\s*\\(Remixed and Remastered\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Version\\)/g,\n    /\\s*\\[Remixed and Remastered\\]/g,\n    /\\s*\\[Remastered\\]/g,\n    /\\s*\\[Expanded\\]/g,\n    /\\s*\\[Expanded Edition\\]/g,\n    /\\s*\\(Standard\\)/g,\n    /\\s*\\- Deluxe Edition/g,\n    /\\s*\\(Special Edition\\)/g,\n    /\\s*\\(Limited Edition\\)/g,\n    /\\s*\\(Definitive Edition\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ Edition\\)/g,\n    /\\s*\\(Reissue\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\- Remastered\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\/ Remastered\\)/g,\n    /\\s*\\(\\s*[A-Za-z0-9]+ \\s*[A-Za-z0-9]+ Track Edition\\)/g\n  ];\n\n  // Iterate over the substrings and remove them from the input string\n\n\nfor (item of items) {\n  \nCAlbumName = item.json.name;\n  const CAlbumArtist = item.json.artists[0].name;\n  const CAlbumLink = item.json.external_urls.spotify;\n  const CAlbumLabel = item.json.label;\n  const CAlbumDateTemp = item.json.release_date;\n\n  for (const pattern of substringsToRemove) {\n    CAlbumName = CAlbumName.replace(pattern, '');\n  }\n\n  CAlbumName = CAlbumName.replace(/&quot;/g, \"'\");\n  CAlbumName = CAlbumName.replace(/&#39;/g, \"'\");\n  CAlbumName = CAlbumName.replace(/&amp;/g, \"and\");\n\n  const dateparts = CAlbumDateTemp.split('-');\n  //if (dateparts.length === 3) {\n    const day = dateparts[2];\n    const monthIndex = parseInt(dateparts[1], 10) - 1;\n    const year = dateparts[0];\n\n    //if (!isNaN(monthIndex) && monthIndex >= 0 && monthIndex < months.length) {\n      const month = months[monthIndex];\n      \n   // }\n  //}\n\n      const CAlbumDate = day + \"-\" + month + \"-\" + year;\n      var ArrayTemp = {AlbumName : CAlbumName, AlbumArtist : CAlbumArtist, AlbumLink : CAlbumLink, AlbumLabel : CAlbumLabel, AlbumDate : CAlbumDate};\n    \n      results.push({json:ArrayTemp});\n  \n  \n}\nreturn results;\n//ESTE FUNCIONA"
+      },
+      "name": "Filtrado",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        260
+      ],
+      "id": "2d6b42d6-218c-4925-8d41-e6cfdf1f2625"
+    },
+    {
+      "parameters": {
+        "operation": "removeDuplicates"
+      },
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        260
+      ],
+      "id": "73c82835-c3a5-4388-9802-6526c628ab59"
+    },
+    {
+      "parameters": {
+        "filePath": "C:\\Users\\nelop\\OneDrive\\EternalRockBot\\Albums.txt"
+      },
+      "id": "7b44bd91-e255-40fb-a941-80bbf860ba83",
+      "name": "Read Binary File",
+      "type": "n8n-nodes-base.readBinaryFile",
+      "typeVersion": 1,
+      "position": [
+        -240,
+        20
+      ]
+    },
+    {
+      "parameters": {
+        "setAllData": false,
+        "options": {}
+      },
+      "name": "Move Binary Data",
+      "type": "n8n-nodes-base.moveBinaryData",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        20
+      ],
+      "id": "e364487f-409c-4e3b-b45b-80282e27a116"
+    },
+    {
+      "parameters": {
+        "functionCode": "return [{json: {\"data\" : $json[\"data\"].split(/\\r?\\n/)}}]"
+      },
+      "name": "Split by Newline",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        100,
+        20
+      ],
+      "id": "23982ebb-cb43-4658-bb9a-6eef9c0e5ed7"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {}
+      },
+      "name": "Item List Data",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        260,
+        20
+      ],
+      "id": "c3ba7919-7efb-477e-8b10-043f3ea79758"
+    },
+    {
+      "parameters": {
+        "longUrl": "={{ $json[\"AlbumLink\"] }}",
+        "additionalFields": {
+          "title": "={{ $json[\"AlbumName\"] }} - Album by {{ $json[\"AlbumArtist\"] }}, released {{ $json[\"AlbumDate\"] }} #NowPlaying"
+        }
+      },
+      "id": "d602d29d-175e-4852-b297-17eebcc3cde8",
+      "name": "Bitly",
+      "type": "n8n-nodes-base.bitly",
+      "typeVersion": 1,
+      "position": [
+        -60,
+        260
+      ],
+      "credentials": {
+        "bitlyApi": {
+          "id": "3",
+          "name": "Bitly account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "id": "2c05f961-1a0d-4c0c-b0de-32230f90790f",
+      "name": "No Operation, do nothing",
+      "type": "n8n-nodes-base.noOp",
+      "typeVersion": 1,
+      "position": [
+        100,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "functionCode": "//ESTE FUNCIONA\nconst results = [];\n\nfor (item of items) {\n\nconst CAlbumURI = item.json.data;\n\nconst AlbumID =CAlbumURI.slice(31, 53);\n\nconst CnewURI = \"spotify:album:\" + AlbumID;\n\nvar ArrayTemp = {newURI : CnewURI, newAlbumID: AlbumID};\n    \nresults.push({json:ArrayTemp});  \n  \n}\n\nreturn results;"
+      },
+      "name": "CrearURI1",
+      "type": "n8n-nodes-base.function",
+      "typeVersion": 1,
+      "position": [
+        440,
+        20
+      ],
+      "id": "d7ed5748-2cd3-43aa-a8a8-64160a7d4f56"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Filtrado": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Move Binary Data": {
+      "main": [
+        [
+          {
+            "node": "Split by Newline",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split by Newline": {
+      "main": [
+        [
+          {
+            "node": "Item List Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Binary File": {
+      "main": [
+        [
+          {
+            "node": "Move Binary Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When clicking \"Execute Workflow\"": {
+      "main": [
+        [
+          {
+            "node": "Read Binary File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item List Data": {
+      "main": [
+        [
+          {
+            "node": "CrearURI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Spotify": {
+      "main": [
+        [
+          {
+            "node": "Filtrado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Bitly": {
+      "main": [
+        [
+          {
+            "node": "No Operation, do nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Bitly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "CrearURI1": {
+      "main": [
+        [
+          {
+            "node": "Spotify",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {},
+  "versionId": "1be933d4-3032-4eac-9ae3-80d8ca7d597e",
+  "id": 11,
+  "meta": {
+    "instanceId": "786b4c54377e10401d6a12d7e189a25feeca180a18048fcae08afa73fd84814f"
+  },
+  "tags": []
+}
